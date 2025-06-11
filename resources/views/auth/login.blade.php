@@ -1,47 +1,59 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="en">
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+<!-- Mirrored from seantheme.com/quantum/page_login.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 Jun 2025 12:04:00 GMT -->
+<head>
+    <meta charset="utf-8"/>
+    <title>Quantum | Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+    <!-- ================== BEGIN core-css ================== -->
+    <link href="{{ asset('assets/css/vendor.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet"/>
+    <!-- ================== END core-css ================== -->
+
+</head>
+<body>
+
+<x-includes.loader/>
+
+<!-- BEGIN #app -->
+<div id="app" class="app app-full-height app-without-header">
+    <!-- BEGIN login -->
+    <div class="login">
+        <!-- BEGIN login-content -->
+        <div class="login-content">
+            <form action="{{ route('login') }}" method="POST">
+                @csrf
+                <h1 class="text-center">Авторизация</h1>
+                <div class="text-body text-opacity-50 text-center mb-5">
+                    АСП UniServer
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Логин</label>
+                    <input type="text" name="name" class="form-control form-control-lg fs-14px"
+                           value="{{ old('name') }}"/>
+                    <x-input-error :messages="$errors->get('name')" class="mt-2"/>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" name="password" class="form-control form-control-lg fs-14px"/>
+                </div>
+                <button type="submit" class="btn btn-theme btn-lg d-block w-100 mb-3">ВОЙТИ</button>
+            </form>
         </div>
+        <!-- END login-content -->
+    </div>
+    <!-- END login -->
+</div>
+<!-- END #app -->
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+<!-- ================== BEGIN core-js ================== -->
+<script src="{{ asset('assets/js/iconify-icon/2.1.0/iconify-icon.min.js') }}"></script>
+<script src="{{ asset('assets/js/vendor.min.js') }}"></script>
+<script src="{{ asset('assets/js/app.min.js') }}"></script>
+<!-- ================== END core-js ================== -->
+</body>
+</html>
