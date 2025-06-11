@@ -12,6 +12,7 @@
     <!-- ================== BEGIN core-css ================== -->
     <link href="{{ asset('assets/css/vendor.min.css') }}" rel="stylesheet"/>
     <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet"/>
     <!-- ================== END core-css ================== -->
 
 </head>
@@ -29,6 +30,7 @@
 <script src="{{ asset('assets/js/iconify-icon/2.1.0/iconify-icon.min.js') }}"></script>
 <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
 <script src="{{ asset('assets/js/app.min.js') }}"></script>
+<script src="{{ asset('assets/js/custom.js') }}"></script>
 <!-- ================== END core-js ================== -->
 <script src="{{ asset('assets/js/demo/sidebar-scrollspy.demo.js') }}"></script>
 </body>

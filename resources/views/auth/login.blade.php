@@ -12,6 +12,7 @@
     <!-- ================== BEGIN core-css ================== -->
     <link href="{{ asset('assets/css/vendor.min.css') }}" rel="stylesheet"/>
     <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet"/>
     <!-- ================== END core-css ================== -->
 
 </head>
@@ -32,14 +33,20 @@
                     АСП UniServer
                 </div>
                 <div class="mb-4">
-                    <label class="form-label">Логин</label>
-                    <input type="text" name="name" class="form-control form-control-lg fs-14px"
-                           value="{{ old('name') }}"/>
-                    <x-input-error :messages="$errors->get('name')" class="mt-2"/>
+                    <label for="name" class="form-label">Логин</label>
+                    <div class="input-group">
+                        <input id="name" name="name" type="text"
+                               class="form-control @error('name') is-invalid @enderror"
+                               value="{{ old('name') }}">
+                        <x-input-error :messages="$errors->get('name')" class="mt-2"/>
+                    </div>
                 </div>
                 <div class="mb-4">
-                    <label class="form-label">Пароль</label>
-                    <input type="password" name="password" class="form-control form-control-lg fs-14px"/>
+                    <label for="password" class="form-label">Пароль</label>
+                    <div class="input-group">
+                        <input id="password" name="password" type="password"
+                               class="form-control @error('name') is-invalid @enderror">
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-theme btn-lg d-block w-100 mb-3">ВОЙТИ</button>
             </form>

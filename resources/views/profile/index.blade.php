@@ -15,7 +15,7 @@
                                 <h4 class="d-flex align-items-center mb-1">
                                     <iconify-icon icon="solar:user-outline"
                                                   class="text-white text-opacity-50 fs-18px me-2 my-n2"></iconify-icon>
-                                    Настройки пользователя
+                                    [Настройки пользователя]
                                 </h4>
                                 <p class="text-white text-opacity-50 small">Информация об аккаунте</p>
                                 <div class="card">
@@ -47,28 +47,37 @@
                                 <h4 class="d-flex align-items-center mb-1">
                                     <iconify-icon icon="solar:notification-unread-lines-outline"
                                                   class="text-white text-opacity-50 fs-18px me-2 my-n2"></iconify-icon>
-                                    Telegram
+                                    [Telegram]
                                 </h4>
                                 <p class="text-white text-opacity-50 small">Настройки связи с Telegram ботом</p>
-                                <form action="{{ route('settings.chat') }}" method="POST"
-                                      class="card">
+                                <form action="{{ route('profile.update') }}" method="POST"
+                                    @class([
+                                      'card',
+                                      'was-validated' => @session('success')
+                                    ])>
                                     @csrf
                                     <div class="card-body">
                                         <label for="chat_id">Chat ID</label>
                                         <div class="input-group">
                                             <input id="chat_id" name="chat_id" type="text"
-                                                   class="form-control @error('chat_id') is-invalid @enderror"
-                                                   value="{{ $telegram !== null ? $telegram['chat_id'] : '' }}">
+                                                   @class([
+                                                    'form-control',
+                                                    'is-invalid' => $errors->get('chat_id')
+                                                   ])
+                                                   value="{{ old('chat_id') ?? ($telegram !== null ? $telegram['chat_id'] : '') }}">
                                             <x-input-error :messages="$errors->get('chat_id')" class="mt-2"/>
+                                            <a href="https://t.me/AspUniServerBot?start_command=/login&user_id={{  $user['id'] }}"
+                                               target="_blank"
+                                               class="btn btn-outline-primary">Подключить
+                                            </a>
                                         </div>
                                     </div>
                                     <div class="card-body">
                                         <label for="username">Username</label>
                                         <div class="input-group">
                                             <input id="username" name="username" type="text"
-                                                   class="form-control @error('username') is-invalid @enderror"
-                                                   value="{{ $telegram !== null ? $telegram['username'] : '' }}">
-                                            <x-input-error :messages="$errors->get('username')" class="mt-2"/>
+                                                   class="form-control"
+                                                   value="{{ old('username') ?? ($telegram !== null ? $telegram['username'] : '') }}">
                                         </div>
                                     </div>
                                     <div class="card-body d-flex align-items-center">
@@ -97,4 +106,6 @@
         <!-- END container -->
     </div>
     <!-- END #content -->
+
+    <x-includes.toast id="updated" title="Успешно" message="Данные успешно обновлены"/>
 </x-app-layout>

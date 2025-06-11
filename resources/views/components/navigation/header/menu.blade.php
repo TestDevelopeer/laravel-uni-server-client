@@ -12,7 +12,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-end me-lg-3 fs-10px fade">
             <h6 class="dropdown-header">МЕНЮ ПОЛЬЗОВАТЕЛЯ</h6>
-            <a class="dropdown-item" href="{{ route('settings.edit') }}">НАСТРОЙКИ</a>
+            <a class="dropdown-item" href="{{ route('profile.index') }}">НАСТРОЙКИ</a>
             <div class="dropdown-divider"></div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

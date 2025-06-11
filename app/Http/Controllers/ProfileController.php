@@ -13,19 +13,15 @@ class ProfileController extends Controller
     /**
      * @throws ConnectionException
      */
-    public function edit()
+    public function index()
     {
         $response = Http::api()->get('/profile');
 
         if ($response->failed()) {
-            if ($response->status() === 401) {
-                return redirect(route('login'));
-            }
-
-            abort($response->status(), $response->body());
+            abort($response->status());
         }
 
-        return view('settings.edit', [
+        return view('profile.index', [
             'user' => $response->json('user'),
             'telegram' => $response->json('telegram'),
         ]);
@@ -34,9 +30,9 @@ class ProfileController extends Controller
     /**
      * @throws ConnectionException
      */
-    public function chat(Request $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $response = Http::api()->post('/profile/chat', [
+        $response = Http::api()->post('/profile/update', [
             'chat_id' => $request->chat_id,
             'username' => $request->username,
         ]);
@@ -48,7 +44,7 @@ class ProfileController extends Controller
                 ]);
             }
 
-            abort($response->status(), $response->body());
+            abort($response->status());
         }
 
         return redirect()->back()->with('success', $response->json('success'));
