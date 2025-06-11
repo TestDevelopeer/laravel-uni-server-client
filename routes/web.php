@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,7 +12,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::get('/settings', [ProfileController::class, 'edit'])->name('settings.edit');
+    Route::post('/settings/chat', [ProfileController::class, 'chat'])->name('settings.chat');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
