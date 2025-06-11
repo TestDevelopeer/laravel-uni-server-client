@@ -35,4 +35,7 @@ return [
         ],
     ],
 
+    'uniserver' => [
+        'api_url' => env('UNISERVER_API_URL'),
+    ]
 ];

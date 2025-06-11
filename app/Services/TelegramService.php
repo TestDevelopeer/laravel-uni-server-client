@@ -2,38 +2,22 @@
 
 namespace App\Services;
 
-use GuzzleHttp\Client;
-use Telegram\Bot\Api;
-use Telegram\Bot\Exceptions\TelegramSDKException;
-use Telegram\Bot\HttpClients\GuzzleHttpClient;
+use App\Models\User;
+use Illuminate\Support\Facades\Http;
 
 class TelegramService
 {
-    protected Api $telegram;
+    protected $user;
 
-    /**
-     * @throws TelegramSDKException
-     */
-    public function __construct()
+    public function __construct($userId)
     {
-        if(app()->environment('local')) {
-            $this->telegram = new Api(config('telegram.bots.mybot.token'), false, new GuzzleHttpClient(new Client([
-                'verify' => false,
-            ])));
-        } else {
-            $this->telegram = new Api(config('telegram.bots.mybot.token'));
-        }
+        $this->user = User::find($userId);
     }
 
-    /**
-     * @throws TelegramSDKException
-     */
-    public function sendNotification($message, $chatId)
+    public function sendNotification($message)
     {
-        $this->telegram->sendMessage([
-            'chat_id' => $chatId,
-            'text' => $message,
-            'parse_mode' => 'HTML'
+        $response = Http::api($this->user->token)->post('/telegram/send/message', [
+            'message' => $message,
         ]);
     }
 

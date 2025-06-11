@@ -11,27 +11,25 @@ use Illuminate\Support\Facades\Auth;
 
 class MonitorUniServerCommand extends Command
 {
-    protected $signature = 'monitor:uniserver';
+    protected $signature = 'monitor:uniserver {userId}';
 
     protected $description = 'Monitor UniServer API for new records';
 
     public function handle(Request $request): void
     {
-        $uniServer = new UniServerService();
-        $telegram = new TelegramService();
+        $userId = $this->argument('userId');
 
-        $this->info('Starting UniServer monitoring...');
+        $uniServer = new UniServerService($userId);
+        $telegram = new TelegramService($userId);
+
+        $this->info("Starting UniServer monitoring for user {$userId}...");
 
         while (true) {
             $newRecord = $uniServer->checkForNewRecords();
-            var_dump($request->user());
+            var_dump($newRecord);
             if ($newRecord) {
-                $chatId = TelegramSetting::where('user_id', Auth::id())->select('chat_id')->first();
-
                 $message = $telegram->formatRecordMessage($newRecord);
-                $telegram->sendNotification($message, $chatId);
-
-                var_dump($newRecord['DOCUMENT_NUMBER']);
+                $telegram->sendNotification($message);
                 $this->info('New record detected and notification sent!');
             }
 

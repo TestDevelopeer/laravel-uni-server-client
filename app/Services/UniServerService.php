@@ -3,41 +3,57 @@
 namespace App\Services;
 
 use App\Models\Journal;
+use App\Models\User;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class UniServerService
 {
-    public function __construct()
+    protected $lastRecordCode = null;
+    protected $user = null;
+
+    /**
+     * @throws ConnectionException
+     */
+    public function __construct($userId)
     {
+        $this->user = User::find($userId);
+        $response = Http::api($this->user->token)->get('/journal');
+        if ($response->successful()) {
+            $this->lastRecordCode = $response->json('journal')['CODE'];
+        }
     }
 
+    /**
+     * @throws ConnectionException
+     */
     public function checkForNewRecords()
     {
-        $currentRecord = $this->getLastRecord();
+        $currentRecord = $this->getLastRecordCode();
 
         if (!$currentRecord) {
             return null;
         }
 
-        $lasRecord = Journal::first();
+        if ($this->lastRecordCode === null) {
+            $this->lastRecordCode = $currentRecord['CODE'];
 
-        if (!$lasRecord) {
-            Journal::create([
-                'identification' => $currentRecord['ID'],
-                'code' => $currentRecord['CODE'],
+            Http::api($this->user->token)->post('/journal', [
+                'code' => $this->lastRecordCode
             ]);
 
             return null;
         }
 
-        if ($currentRecord['ID'] !== $lasRecord['identification']) {
-            $lasRecord['identification'] = $currentRecord['ID'];
-            $lasRecord['code'] = $currentRecord['CODE'];
-            $lasRecord->save();
-            $lasRecord->fresh();
+        if ($currentRecord['CODE'] !== $this->lastRecordCode) {
+            $this->lastRecordCode = $currentRecord['CODE'];
+
+            Http::api($this->user->token)->post('/journal', [
+                'code' => $this->lastRecordCode
+            ]);
 
             return $currentRecord;
         }
@@ -45,14 +61,14 @@ class UniServerService
         return null;
     }
 
-    public function getLastRecord()
+    public function getLastRecordCode()
     {
         try {
             $response = Http::uniserver()->get("/SendMsg", [
                 'Name' => 'AutoScaleJournal1_GetRecords',
                 'Value' => json_encode(['Filter' => [], 'MaxRows' => 1], JSON_THROW_ON_ERROR),
-                'auth_user' => Auth::user()->uniserver_name,
-                'auth_password' => Auth::user()->uniserver_password,
+                'auth_user' => $this->user->uniserver_name,
+                'auth_password' => $this->user->uniserver_password,
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);

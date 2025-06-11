@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
@@ -22,8 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Http::macro('api', function () {
-            if (Auth::check()) {
+        Http::macro('api', function ($token = null) {
+            if ($token !== null || Auth::check()) {
                 return Http::globalResponseMiddleware(
                     function ($response) {
                         if ($response->getStatusCode() === 401) {
@@ -32,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
 
                         return $response;
                     }
-                )->withToken(Auth::user()->token)
+                )->withToken($token ?? Auth::user()->token)
                     ->withHeaders([
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
