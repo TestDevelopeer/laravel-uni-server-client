@@ -14,14 +14,14 @@ class TelegramService
         $this->user = User::find($userId);
     }
 
-    public function sendNotification($message)
+    public function sendNotification($message): void
     {
-        $response = Http::api($this->user->token)->post('/telegram/send/message', [
+        $response = Http::api($this->user->apiToken())->post('/telegram/send/message', [
             'message' => $message,
         ]);
     }
 
-    public function formatRecordMessage(array $record)
+    public function formatRecordMessage(array $record): string
     {
         $message = "<b>Новая запись в журнале взвешиваний</b>\n";
         $message .= "--------------------------------\n";

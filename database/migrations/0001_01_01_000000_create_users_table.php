@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->string('uniserver_name')->nullable();
             $table->string('password');
             $table->string('uniserver_password')->nullable();
-            $table->string('token')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

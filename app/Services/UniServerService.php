@@ -21,7 +21,7 @@ class UniServerService
     public function __construct($userId)
     {
         $this->user = User::find($userId);
-        $response = Http::api($this->user->token)->get('/journal');
+        $response = Http::api($this->user->apiToken())->get('/journal');
         if ($response->successful()) {
             $this->lastRecordCode = $response->json('journal')['CODE'];
         }
@@ -41,7 +41,7 @@ class UniServerService
         if ($this->lastRecordCode === null) {
             $this->lastRecordCode = $currentRecord['CODE'];
 
-            Http::api($this->user->token)->post('/journal', [
+            Http::api($this->user->apiToken())->post('/journal', [
                 'code' => $this->lastRecordCode
             ]);
 
@@ -51,7 +51,7 @@ class UniServerService
         if ($currentRecord['CODE'] !== $this->lastRecordCode) {
             $this->lastRecordCode = $currentRecord['CODE'];
 
-            Http::api($this->user->token)->post('/journal', [
+            Http::api($this->user->apiToken())->post('/journal', [
                 'code' => $this->lastRecordCode
             ]);
 

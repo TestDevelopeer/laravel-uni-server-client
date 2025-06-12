@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
 
                         return $response;
                     }
-                )->withToken($token ?? Auth::user()->token)
+                )->withToken($token ?? Auth::user()->apiToken())
                     ->withHeaders([
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',

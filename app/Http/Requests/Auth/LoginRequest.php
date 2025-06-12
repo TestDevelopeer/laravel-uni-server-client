@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\ApiToken;
 use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +50,7 @@ class LoginRequest extends FormRequest
 
         $response = Http::api()->post('/login', [
             'name' => $this->name,
-            'password' => $this->password
+            'password' => $this->password,
         ]);
 
         if ($response->failed()) {
@@ -62,12 +64,27 @@ class LoginRequest extends FormRequest
         $data = $response->json();
 
         $dataUser = $data['user'];
-        $dataUser['token'] = $data['token'];
         $dataUser['password'] = Hash::make($this->password);
 
-        $user = User::updateOrCreate(['name' => $dataUser['name']], $dataUser);
+        try {
+            $user = User::where('name', $dataUser['name'])->first();
+            if (!$user) {
+                $user = User::create($dataUser);
+            }
 
-        if(!$user) {
+            $token = ApiToken::updateOrCreate(['app_name' => config('app.name'), 'user_id' => $user->id], [
+                'user_id' => $user->id,
+                'token' => $data['token'],
+                'app_name' => config('app.name'),
+            ]);
+
+
+            if (!$token) {
+                throw ValidationException::withMessages([
+                    'name' => trans('auth.failed'),
+                ]);
+            }
+        } catch (QueryException|\Exception $e) {
             throw ValidationException::withMessages([
                 'name' => trans('auth.failed'),
             ]);
@@ -85,7 +102,7 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
@@ -106,6 +123,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('name')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('name')) . '|' . $this->ip());
     }
 }
