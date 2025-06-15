@@ -10,16 +10,22 @@ use Illuminate\Support\Facades\Log;
 
 class UniServerService
 {
-    protected $lastRecordCode = null;
-    protected $user = null;
+    protected string|null $lastRecordCode = null;
+    protected array $user;
+    protected string $token;
+
+    public function __construct($token, $user)
+    {
+        $this->token = $token;
+        $this->user = $user;
+    }
 
     /**
      * @throws ConnectionException
      */
-    public function __construct($userId)
+    public function setLastRecordCode(): void
     {
-        $this->user = User::find($userId);
-        $response = Http::api($this->user->apiToken())->get('/journal');
+        $response = Http::api($this->token)->get('/journal');
         if ($response->successful()) {
             $this->lastRecordCode = $response->json('journal')['CODE'];
         }
@@ -39,7 +45,7 @@ class UniServerService
         if ($this->lastRecordCode === null) {
             $this->lastRecordCode = $currentRecord['CODE'];
 
-            Http::api($this->user->apiToken())->post('/journal', [
+            Http::api($this->token)->post('/journal', [
                 'code' => $this->lastRecordCode
             ]);
 
@@ -49,7 +55,7 @@ class UniServerService
         if ($currentRecord['CODE'] !== $this->lastRecordCode) {
             $this->lastRecordCode = $currentRecord['CODE'];
 
-            Http::api($this->user->apiToken())->post('/journal', [
+            Http::api($this->token)->post('/journal', [
                 'code' => $this->lastRecordCode
             ]);
 
@@ -65,8 +71,8 @@ class UniServerService
             $response = Http::uniserver()->get("/SendMsg", [
                 'Name' => 'AutoScaleJournal1_GetRecords',
                 'Value' => json_encode(['Filter' => [], 'MaxRows' => 1], JSON_THROW_ON_ERROR),
-                'auth_user' => $this->user->uniserver_name,
-                'auth_password' => $this->user->uniserver_password,
+                'auth_user' => $this->user['name'],
+                'auth_password' => $this->user['password'],
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
