@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Journal;
 use App\Models\User;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 

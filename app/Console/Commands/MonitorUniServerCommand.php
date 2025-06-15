@@ -2,22 +2,20 @@
 
 namespace App\Console\Commands;
 
-use App\Models\TelegramSetting;
 use App\Services\TelegramService;
 use App\Services\UniServerService;
 use Illuminate\Console\Command;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Console\Isolatable;
 
-class MonitorUniServerCommand extends Command
+class MonitorUniServerCommand extends Command implements Isolatable
 {
-    protected $signature = 'monitor:uniserver {userId}';
+    protected $signature = 'monitor:uniserver {--user=}';
 
     protected $description = 'Monitor UniServer API for new records';
 
-    public function handle(Request $request): void
+    public function handle(): void
     {
-        $userId = $this->argument('userId');
+        $userId = $this->option('user');
 
         $uniServer = new UniServerService($userId);
         $telegram = new TelegramService($userId);
@@ -26,7 +24,6 @@ class MonitorUniServerCommand extends Command
 
         while (true) {
             $newRecord = $uniServer->checkForNewRecords();
-            var_dump($newRecord);
             if ($newRecord) {
                 $message = $telegram->formatRecordMessage($newRecord);
                 $telegram->sendNotification($message);

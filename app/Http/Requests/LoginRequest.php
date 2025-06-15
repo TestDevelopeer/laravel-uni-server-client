@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests;
 
 use App\Models\ApiToken;
 use App\Models\User;
@@ -36,63 +36,6 @@ class LoginRequest extends FormRequest
             'name' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
-    }
-
-    /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws ConnectionException
-     */
-    public function authenticate(): void
-    {
-        $this->ensureIsNotRateLimited();
-
-        $response = Http::api()->post('/login', [
-            'name' => $this->name,
-            'password' => $this->password,
-        ]);
-
-        if ($response->failed()) {
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'name' => trans('auth.failed'),
-            ]);
-        }
-
-        $data = $response->json();
-
-        $dataUser = $data['user'];
-        $dataUser['password'] = Hash::make($this->password);
-
-        try {
-            $user = User::where('name', $dataUser['name'])->first();
-            if (!$user) {
-                $user = User::create($dataUser);
-            }
-
-            $token = ApiToken::updateOrCreate(['app_name' => config('app.name'), 'user_id' => $user->id], [
-                'user_id' => $user->id,
-                'token' => $data['token'],
-                'app_name' => config('app.name'),
-            ]);
-
-
-            if (!$token) {
-                throw ValidationException::withMessages([
-                    'name' => trans('auth.failed'),
-                ]);
-            }
-        } catch (QueryException|\Exception $e) {
-            throw ValidationException::withMessages([
-                'name' => trans('auth.failed'),
-            ]);
-        }
-
-        Auth::attempt(['name' => $this->name, 'password' => $this->password], true);
-
-        RateLimiter::clear($this->throttleKey());
     }
 
     /**

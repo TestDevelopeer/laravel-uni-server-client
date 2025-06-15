@@ -2,40 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Client\ConnectionException;
+use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\ProfileService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
-    /**
-     * @throws ConnectionException
-     */
-    public function index()
+    protected ProfileService $profileService;
+
+    public function __construct(ProfileService $profileService)
     {
-        $response = Http::api()->get('/profile');
+        $this->profileService = $profileService;
+    }
+
+    public function show()
+    {
+        $response = $this->profileService->getProfileInfo();
 
         if ($response->failed()) {
             abort($response->status());
         }
 
+        $data = $response->json();
+
         return view('profile.index', [
-            'user' => $response->json('user'),
-            'telegram' => $response->json('telegram'),
+            'user' => $data['user'],
+            'telegram' => $data['telegram'],
         ]);
     }
 
-    /**
-     * @throws ConnectionException
-     */
-    public function update(Request $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $response = Http::api()->post('/profile/update', [
-            'chat_id' => $request->chat_id,
-            'username' => $request->username,
-        ]);
+        $data = $request->validated();
+
+        $response = $this->profileService->updateProfileChatId($data['chat_id']);
 
         if ($response->failed()) {
             if ($response->status() === 422) {
@@ -43,7 +44,6 @@ class ProfileController extends Controller
                     'chat_id' => $response->json('message'),
                 ]);
             }
-
             abort($response->status());
         }
 

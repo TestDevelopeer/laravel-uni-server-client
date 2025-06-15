@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
@@ -16,8 +14,7 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'chat_id' => ['required', 'integer', 'max:255'],
-            'username' => ['nullable', 'string', 'lowercase', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
+            'chat_id' => ['required', 'integer', 'max_digits::11'],
         ];
     }
 }

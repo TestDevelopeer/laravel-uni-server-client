@@ -14,9 +14,9 @@ class TelegramService
         $this->user = User::find($userId);
     }
 
-    public function sendNotification($message): void
+    public function sendNotification($message)
     {
-        $response = Http::api($this->user->apiToken())->post('/telegram/send/message', [
+        return Http::api($this->user->apiToken())->post('/telegram/send/message', [
             'message' => $message,
         ]);
     }

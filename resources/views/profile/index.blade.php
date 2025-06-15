@@ -75,9 +75,9 @@
                                     <div class="card-body">
                                         <label for="username">Username</label>
                                         <div class="input-group">
-                                            <input id="username" name="username" type="text"
+                                            <input disabled id="username" name="username" type="text"
                                                    class="form-control"
-                                                   value="{{ old('username') ?? ($telegram !== null ? $telegram['username'] : '') }}">
+                                                   value="{{ $telegram !== null ? $telegram['username'] : '' }}">
                                         </div>
                                     </div>
                                     <div class="card-body d-flex align-items-center">
